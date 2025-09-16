@@ -13,7 +13,7 @@ CORS(app)
 MONGODBURL = os.getenv('MONGODBURL')
 client = MongoClient(MONGODBURL)
 db = client['flaskdb']
-collection = db['users']
+
 @app.route('/api',methods=["GET"])
 def get_data():
     with open('data.json','r') as file:
@@ -25,12 +25,26 @@ def submit_data():
     try:
         name = request.form['name']
         age = request.form['age']
+        collection = db['users']
         collection.insert_one({'name':name,'age':age})
         return jsonify({"status": True})
     except Exception as e:
         print(str(e))
         return jsonify({"status": False})
-    
+
+@app.route('/submittodoitem',method=["POST"])  
+def submit_todo_item():
+    try:
+        name = request.form['itemName']
+        desc = request.form['itemDescription']
+        collection = db['items']
+        collection.insert_one({'itemName':name,'itemDescription':desc})
+        return jsonify({'status':True})
+    except Exception as e:
+        print(str(e))
+        return jsonify({'status':False}) 
+
+
 if __name__=='__main__':
     app.run(host="0.0.0.0", port=3000,debug=True)
 
